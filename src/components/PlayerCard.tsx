@@ -1,8 +1,8 @@
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { cn } from "@/lib/utils";
-import { TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { TrendingUp, TrendingDown, Minus, Info } from "lucide-react";
 
 interface PlayerCardProps {
   id: string;
@@ -16,7 +16,7 @@ interface PlayerCardProps {
   estimatedValue: number;
   imageUrl?: string;
   age: number;
-  className?: string;
+  onClick?: () => void;
 }
 
 export function PlayerCard({
@@ -31,15 +31,16 @@ export function PlayerCard({
   estimatedValue,
   imageUrl,
   age,
-  className,
+  onClick
 }: PlayerCardProps) {
-  const [isLoading, setIsLoading] = useState(true);
+  const [imageLoaded, setImageLoaded] = useState(false);
   
-  // Calculate value difference
-  const valueDifference = estimatedValue - marketValue;
-  const differencePercent = Math.round((valueDifference / marketValue) * 100);
+  // Calculate value difference and format
+  const valueDiff = estimatedValue - marketValue;
+  const valueDiffPercent = Math.round((valueDiff / marketValue) * 100);
+  const diffDirection = valueDiff > 0 ? "up" : valueDiff < 0 ? "down" : "neutral";
   
-  // Format market value in millions
+  // Format currency (in millions/thousands)
   const formatValue = (value: number) => {
     if (value >= 1000000) {
       return `€${(value / 1000000).toFixed(1)}M`;
@@ -48,108 +49,119 @@ export function PlayerCard({
     }
     return `€${value}`;
   };
-  
-  const valueDirection = valueDifference > 0 ? "up" : valueDifference < 0 ? "down" : "same";
-  
-  // Generate placeholder for image loading
-  const placeholderName = name.split(' ').map(part => part[0]).join('');
 
   return (
-    <Link to={`/player/${id}`} className={cn("block", className)}>
-      <div className="glass-panel rounded-xl overflow-hidden transition-all duration-300 hover-lift">
-        {/* Player Image Section */}
-        <div className="aspect-[3/4] relative bg-secondary/50 overflow-hidden">
-          {/* Status Badge */}
-          <div className={cn(
-            "absolute top-4 right-4 z-10 px-2.5 py-1 rounded-full text-xs font-medium",
-            valueDirection === "up" ? "bg-green-100 text-green-800" : 
-            valueDirection === "down" ? "bg-red-100 text-red-800" : 
-            "bg-gray-100 text-gray-800"
-          )}>
-            <div className="flex items-center space-x-1">
-              {valueDirection === "up" ? <TrendingUp className="h-3 w-3" /> : 
-               valueDirection === "down" ? <TrendingDown className="h-3 w-3" /> : 
-               <Minus className="h-3 w-3" />}
-              <span>{differencePercent > 0 ? "+" : ""}{differencePercent}%</span>
-            </div>
-          </div>
-          
-          {/* Player Image or Placeholder */}
-          {imageUrl ? (
-            <>
-              <div className={cn(
-                "absolute inset-0 bg-gray-200 flex items-center justify-center text-2xl font-bold text-gray-400 transition-opacity duration-300",
-                isLoading ? "opacity-100" : "opacity-0"
-              )}>
-                {placeholderName}
-              </div>
-              <img 
-                src={imageUrl} 
-                alt={name} 
-                className={cn(
-                  "w-full h-full object-cover transition-opacity duration-500",
-                  isLoading ? "opacity-0" : "opacity-100"
-                )}
-                onLoad={() => setIsLoading(false)}
-              />
-            </>
-          ) : (
-            <div className="absolute inset-0 bg-gray-200 flex items-center justify-center text-4xl font-bold text-gray-400">
-              {placeholderName}
+    <Card 
+      className="overflow-hidden transition-all duration-200 hover:shadow-lg hover:-translate-y-1 cursor-pointer"
+      onClick={onClick}
+    >
+      <CardHeader className="p-0">
+        <div className="relative h-48 w-full bg-secondary/50">
+          {!imageLoaded && (
+            <div className="absolute inset-0 flex items-center justify-center bg-secondary text-6xl font-bold text-secondary-foreground/30">
+              {name.split(' ').map(n => n[0]).join('')}
             </div>
           )}
-        </div>
-        
-        {/* Player Info Section */}
-        <div className="p-4">
-          <div className="flex justify-between items-start mb-2">
-            <div>
-              <h3 className="font-semibold text-lg line-clamp-1">{name}</h3>
-              <div className="flex items-center space-x-2 text-sm text-foreground/70">
-                <span>{position}</span>
-                <span className="text-foreground/30">•</span>
-                <span>{age} yrs</span>
-              </div>
+          {imageUrl && (
+            <img 
+              src={imageUrl} 
+              alt={name} 
+              className={`w-full h-full object-cover object-top transition-opacity duration-300 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
+              onLoad={() => setImageLoaded(true)}
+            />
+          )}
+          
+          {/* Top badges */}
+          <div className="absolute top-3 left-3 right-3 flex justify-between items-start">
+            <div className="bg-background/80 backdrop-blur-sm px-2 py-1 rounded-md text-xs font-medium">
+              {age} y.o.
+            </div>
+            <div className="bg-background/80 backdrop-blur-sm px-2 py-1 rounded-md text-xs font-medium flex items-center">
+              {position}
             </div>
           </div>
           
-          {/* Club and Nationality */}
-          <div className="flex items-center justify-between mt-3 text-sm">
-            <div className="flex items-center space-x-1.5">
+          {/* Bottom info */}
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+            <h3 className="text-white font-semibold text-lg mb-1 truncate">{name}</h3>
+            <div className="flex items-center">
               {clubLogo && (
-                <img src={clubLogo} alt={club} className="w-4 h-4 object-contain" />
+                <img src={clubLogo} alt={club} className="w-4 h-4 mr-1.5 object-contain" />
               )}
-              <span className="text-foreground/80">{club}</span>
-            </div>
-            <div className="flex items-center space-x-1.5">
-              {nationalityFlag && (
-                <img src={nationalityFlag} alt={nationality} className="w-4 h-4 object-contain" />
-              )}
-              <span className="text-foreground/80">{nationality}</span>
-            </div>
-          </div>
-          
-          {/* Value Section */}
-          <div className="mt-4 pt-4 border-t border-border">
-            <div className="flex justify-between items-baseline">
-              <div>
-                <div className="text-xs text-foreground/60 mb-1">Market Value</div>
-                <div className="font-semibold">{formatValue(marketValue)}</div>
-              </div>
-              <div className="text-right">
-                <div className="text-xs text-foreground/60 mb-1">Our Estimate</div>
-                <div className={cn(
-                  "font-semibold",
-                  valueDirection === "up" ? "text-green-600" : 
-                  valueDirection === "down" ? "text-red-600" : ""
-                )}>
-                  {formatValue(estimatedValue)}
-                </div>
+              <span className="text-white/90 text-sm">{club}</span>
+              
+              <div className="ml-auto flex items-center">
+                {nationalityFlag && (
+                  <img src={nationalityFlag} alt={nationality} className="w-4 h-3 mr-1.5 object-contain" />
+                )}
+                <span className="text-white/90 text-sm">{nationality}</span>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </Link>
+      </CardHeader>
+      
+      <CardContent className="p-4">
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <div className="text-xs text-muted-foreground mb-1">Market Value</div>
+            <div className="text-lg font-bold">{formatValue(marketValue)}</div>
+          </div>
+          
+          <div>
+            <div className="text-xs text-muted-foreground mb-1">Our Estimate</div>
+            <div className="flex items-center">
+              <div className={`text-lg font-bold ${
+                diffDirection === "up" ? "text-green-600" : 
+                diffDirection === "down" ? "text-red-600" : ""
+              }`}>
+                {formatValue(estimatedValue)}
+              </div>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+      
+      <CardFooter className="px-4 py-3 bg-secondary/10 border-t border-border">
+        <div className="flex items-center w-full">
+          <span className="text-sm">Value difference:</span>
+          <div className="ml-auto flex items-center">
+            {diffDirection === "up" ? (
+              <TrendingUp className="text-green-600 h-4 w-4 mr-1" />
+            ) : diffDirection === "down" ? (
+              <TrendingDown className="text-red-600 h-4 w-4 mr-1" />
+            ) : (
+              <Minus className="text-gray-500 h-4 w-4 mr-1" />
+            )}
+            
+            <span className={`text-sm font-medium ${
+              diffDirection === "up" ? "text-green-600" : 
+              diffDirection === "down" ? "text-red-600" : "text-gray-500"
+            }`}>
+              {Math.abs(valueDiffPercent)}%
+            </span>
+            
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button className="ml-1.5 text-muted-foreground hover:text-foreground">
+                    <Info className="h-3.5 w-3.5" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="top">
+                  <p className="text-xs">
+                    {diffDirection === "up" 
+                      ? "Our AI estimates this player is undervalued"
+                      : diffDirection === "down"
+                      ? "Our AI estimates this player is overvalued"
+                      : "Our AI estimate matches the market value"}
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+        </div>
+      </CardFooter>
+    </Card>
   );
 }

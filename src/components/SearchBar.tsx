@@ -23,14 +23,14 @@ export function SearchBar({
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   
-  // Example search suggestions
+  // Example search suggestions with IDs
   const suggestions = [
-    "Lionel Messi",
-    "Cristiano Ronaldo",
-    "Kylian Mbappé",
-    "Erling Haaland",
-    "Kevin De Bruyne"
-  ].filter(name => name.toLowerCase().includes(query.toLowerCase()));
+    { id: "player1", name: "Lionel Messi" },
+    { id: "player2", name: "Cristiano Ronaldo" },
+    { id: "player3", name: "Kylian Mbappé" },
+    { id: "player4", name: "Erling Haaland" },
+    { id: "player5", name: "Kevin De Bruyne" }
+  ].filter(player => player.name.toLowerCase().includes(query.toLowerCase()));
   
   const handleSearch = () => {
     if (!query.trim()) return;
@@ -47,6 +47,12 @@ export function SearchBar({
       setIsSearching(false);
       setIsFocused(false);
     }, 500);
+  };
+
+  const handlePlayerSelect = (playerId: string, playerName: string) => {
+    setQuery(playerName);
+    navigate(`/player/${playerId}`);
+    setIsFocused(false);
   };
   
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -111,16 +117,13 @@ export function SearchBar({
             Suggestions
           </div>
           <ul>
-            {suggestions.map((suggestion, index) => (
-              <li key={index}>
+            {suggestions.map((suggestion) => (
+              <li key={suggestion.id}>
                 <button
                   className="w-full text-left px-3 py-2 rounded-md text-sm hover:bg-secondary transition-colors"
-                  onClick={() => {
-                    setQuery(suggestion);
-                    handleSearch();
-                  }}
+                  onClick={() => handlePlayerSelect(suggestion.id, suggestion.name)}
                 >
-                  {suggestion}
+                  {suggestion.name}
                 </button>
               </li>
             ))}

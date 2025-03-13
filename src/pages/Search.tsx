@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { SearchBar } from "@/components/SearchBar";
 import { PlayerCard } from "@/components/PlayerCard";
@@ -100,6 +101,7 @@ const Search = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [players, setPlayers] = useState(samplePlayers);
   const [showFilters, setShowFilters] = useState(false);
+  const navigate = useNavigate();
   
   // Filter logic would go here in a real app
   const handleSearch = (query: string) => {
@@ -118,6 +120,10 @@ const Search = () => {
       setSearchQuery(query);
       setIsLoading(false);
     }, 500); // Simulating API delay
+  };
+
+  const handlePlayerClick = (playerId: string) => {
+    navigate(`/player/${playerId}`);
   };
   
   return (
@@ -157,7 +163,7 @@ const Search = () => {
           
           {/* Filter Panel (simplified) */}
           {showFilters && (
-            <div className="glass-panel rounded-lg p-4 mb-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="glass-panel rounded-lg p-4 mb-4 grid grid-cols-1 md:grid-cols-3 gap-4 animate-fade-in">
               <div className="space-y-2">
                 <h4 className="text-sm font-medium">Position</h4>
                 <div className="flex flex-wrap gap-2">
@@ -228,6 +234,7 @@ const Search = () => {
                   estimatedValue={player.estimatedValue}
                   imageUrl={player.imageUrl}
                   age={player.age}
+                  onClick={() => handlePlayerClick(player.id)}
                 />
               ))}
             </div>

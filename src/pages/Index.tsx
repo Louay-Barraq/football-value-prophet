@@ -15,6 +15,7 @@ const Index = () => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const [isScrolled, setIsScrolled] = useState(false);
 
   // Function to handle Get Started click
   const handleGetStarted = () => {
@@ -24,6 +25,17 @@ const Index = () => {
       setIsAuthModalOpen(true);
     }
   };
+
+  // Add scroll listener for animations
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY;
+      setIsScrolled(scrollPosition > 100);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Sample statistics data for the chart
   const statData = [
@@ -99,7 +111,7 @@ const Index = () => {
       </section>
       
       {/* Featured Players Section */}
-      <section className="py-16">
+      <section className={`py-16 transition-all duration-700 ${isScrolled ? 'opacity-100' : 'opacity-0 transform translate-y-10'}`}>
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-12">
             <div>
@@ -109,22 +121,28 @@ const Index = () => {
               </div>
               <h2 className="text-3xl font-bold">Trending Valuations</h2>
             </div>
-            <Button variant="ghost" className="mt-4 md:mt-0" size="sm">
+            <Button variant="ghost" className="mt-4 md:mt-0" size="sm" onClick={() => navigate('/search')}>
               View All Players
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {featuredPlayers.map(player => (
-              <PlayerCard key={player.id} {...player} />
+            {featuredPlayers.map((player, index) => (
+              <div key={player.id} 
+                className={`transition-all duration-700 delay-${index * 100} ${isScrolled ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+                <PlayerCard 
+                  {...player} 
+                  onClick={() => navigate(`/player/${player.id}`)}
+                />
+              </div>
             ))}
           </div>
         </div>
       </section>
       
       {/* Statistics Section */}
-      <section className="py-16 bg-gradient-to-b from-white to-secondary/30">
+      <section className={`py-16 bg-gradient-to-b from-white to-secondary/30 transition-all duration-700 ${isScrolled ? 'opacity-100' : 'opacity-0 transform translate-y-10'}`}>
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center mb-12">
             <div className="inline-flex items-center px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
@@ -148,7 +166,7 @@ const Index = () => {
       </section>
       
       {/* How It Works Section */}
-      <section className="py-16">
+      <section className={`py-16 transition-all duration-700 ${isScrolled ? 'opacity-100' : 'opacity-0 transform translate-y-10'}`}>
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center mb-12">
             <div className="inline-flex items-center px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
@@ -209,7 +227,7 @@ const Index = () => {
         </div>
       </section>
       
-      {/* Footer */}
+      {/* Simplified Footer */}
       <footer className="py-12 bg-secondary/50 border-t border-border">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-center">
@@ -221,39 +239,11 @@ const Index = () => {
                 AI-powered football player valuation
               </p>
             </div>
-            
-            <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-8">
-              <div className="flex flex-col space-y-2">
-                <div className="font-medium mb-1">Product</div>
-                <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Features</a>
-                <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Pricing</a>
-                <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">API</a>
-              </div>
-              
-              <div className="flex flex-col space-y-2">
-                <div className="font-medium mb-1">Resources</div>
-                <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Documentation</a>
-                <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Blog</a>
-                <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Support</a>
-              </div>
-              
-              <div className="flex flex-col space-y-2">
-                <div className="font-medium mb-1">Company</div>
-                <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">About</a>
-                <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Careers</a>
-                <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Contact</a>
-              </div>
-            </div>
           </div>
           
-          <div className="border-t border-border mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
-            <div className="text-sm text-muted-foreground mb-4 md:mb-0">
+          <div className="border-t border-border mt-12 pt-8 flex justify-center">
+            <div className="text-sm text-muted-foreground">
               © 2023 ValueProphet. All rights reserved.
-            </div>
-            <div className="flex space-x-6">
-              <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Terms</a>
-              <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Privacy</a>
-              <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Cookies</a>
             </div>
           </div>
         </div>
