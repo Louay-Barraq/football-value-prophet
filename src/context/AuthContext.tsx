@@ -1,5 +1,6 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { useToast } from "@/components/ui/use-toast";
 
 type User = {
   id: string;
@@ -22,6 +23,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
     // Check for saved auth state in localStorage
@@ -54,8 +56,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       setUser(demoUser);
       localStorage.setItem("user", JSON.stringify(demoUser));
+      
+      toast({
+        title: "Login successful",
+        description: `Welcome back, ${demoUser.name}!`,
+        variant: "default",
+      });
     } catch (error) {
       console.error("Login failed", error);
+      toast({
+        title: "Login failed",
+        description: "Invalid email or password",
+        variant: "destructive",
+      });
       throw new Error("Invalid email or password");
     } finally {
       setIsLoading(false);
@@ -79,8 +92,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       setUser(newUser);
       localStorage.setItem("user", JSON.stringify(newUser));
+      
+      toast({
+        title: "Account created",
+        description: "Your account has been created successfully!",
+        variant: "default",
+      });
     } catch (error) {
       console.error("Signup failed", error);
+      toast({
+        title: "Signup failed",
+        description: "Failed to create your account. Please try again.",
+        variant: "destructive",
+      });
       throw new Error("Failed to create account");
     } finally {
       setIsLoading(false);
@@ -90,6 +114,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     setUser(null);
     localStorage.removeItem("user");
+    toast({
+      title: "Logged out",
+      description: "You have been logged out successfully.",
+      variant: "default",
+    });
   };
 
   return (

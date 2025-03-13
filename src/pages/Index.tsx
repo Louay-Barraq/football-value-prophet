@@ -1,5 +1,6 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
@@ -8,9 +9,21 @@ import { PlayerCard } from "@/components/PlayerCard";
 import { StatisticsChart } from "@/components/StatisticsChart";
 import { AuthModal } from "@/components/AuthModal";
 import { ArrowRight, Brain, BarChart3, Users } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
 const Index = () => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
+  // Function to handle Get Started click
+  const handleGetStarted = () => {
+    if (isAuthenticated) {
+      navigate("/dashboard");
+    } else {
+      setIsAuthModalOpen(true);
+    }
+  };
 
   // Sample statistics data for the chart
   const statData = [
@@ -185,7 +198,7 @@ const Index = () => {
           </div>
           
           <div className="text-center mt-12">
-            <Button size="lg" onClick={() => setIsAuthModalOpen(true)}>
+            <Button size="lg" onClick={handleGetStarted}>
               Get Started Free
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
