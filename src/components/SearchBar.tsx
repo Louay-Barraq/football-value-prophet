@@ -51,8 +51,11 @@ export function SearchBar({
 
   const handlePlayerSelect = (playerId: string, playerName: string) => {
     setQuery(playerName);
-    navigate(`/player/${playerId}`);
-    setIsFocused(false);
+    // Ensure navigation happens after state updates
+    setTimeout(() => {
+      navigate(`/player/${playerId}`);
+      setIsFocused(false);
+    }, 0);
   };
   
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {

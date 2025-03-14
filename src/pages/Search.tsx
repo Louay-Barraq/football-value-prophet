@@ -1,6 +1,6 @@
 
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { SearchBar } from "@/components/SearchBar";
 import { PlayerCard } from "@/components/PlayerCard";
@@ -102,6 +102,17 @@ const Search = () => {
   const [players, setPlayers] = useState(samplePlayers);
   const [showFilters, setShowFilters] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Parse query parameter on load
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const query = params.get("q");
+    if (query) {
+      setSearchQuery(query);
+      handleSearch(query);
+    }
+  }, [location.search]);
   
   // Filter logic would go here in a real app
   const handleSearch = (query: string) => {
@@ -123,7 +134,14 @@ const Search = () => {
   };
 
   const handlePlayerClick = (playerId: string) => {
+    // Ensure navigation happens correctly
     navigate(`/player/${playerId}`);
+  };
+  
+  const applyFilters = () => {
+    // This would apply filters in a real app
+    // For now, just close the filter panel
+    setShowFilters(false);
   };
   
   return (
@@ -196,7 +214,7 @@ const Search = () => {
                   <SlidersHorizontal className="mr-2 h-4 w-4" />
                   Advanced Filters
                 </Button>
-                <Button size="sm">Apply Filters</Button>
+                <Button size="sm" onClick={applyFilters}>Apply Filters</Button>
               </div>
             </div>
           )}

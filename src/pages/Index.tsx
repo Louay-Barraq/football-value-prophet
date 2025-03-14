@@ -16,6 +16,18 @@ const Index = () => {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isVisible, setIsVisible] = useState({
+    featured: false,
+    stats: false,
+    howItWorks: false
+  });
+
+  // Function to handle Auth Modal
+  useEffect(() => {
+    const handleOpenAuthModal = () => setIsAuthModalOpen(true);
+    window.addEventListener("open-auth-modal", handleOpenAuthModal);
+    return () => window.removeEventListener("open-auth-modal", handleOpenAuthModal);
+  }, []);
 
   // Function to handle Get Started click
   const handleGetStarted = () => {
@@ -26,7 +38,7 @@ const Index = () => {
     }
   };
 
-  // Add scroll listener for animations
+  // Enhanced scroll listener for animations with IntersectionObserver
   useEffect(() => {
     const handleScroll = () => {
       const scrollPosition = window.scrollY;
@@ -34,7 +46,40 @@ const Index = () => {
     };
 
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    
+    // Set up IntersectionObserver for each section
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: "0px 0px -100px 0px"
+    };
+    
+    const featuredSection = document.getElementById('featured-section');
+    const statsSection = document.getElementById('stats-section');
+    const howItWorksSection = document.getElementById('how-it-works-section');
+    
+    const sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const sectionId = entry.target.id;
+          if (sectionId === 'featured-section') {
+            setIsVisible(prev => ({ ...prev, featured: true }));
+          } else if (sectionId === 'stats-section') {
+            setIsVisible(prev => ({ ...prev, stats: true }));
+          } else if (sectionId === 'how-it-works-section') {
+            setIsVisible(prev => ({ ...prev, howItWorks: true }));
+          }
+        }
+      });
+    }, observerOptions);
+    
+    if (featuredSection) sectionObserver.observe(featuredSection);
+    if (statsSection) sectionObserver.observe(statsSection);
+    if (howItWorksSection) sectionObserver.observe(howItWorksSection);
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      sectionObserver.disconnect();
+    };
   }, []);
 
   // Sample statistics data for the chart
@@ -89,6 +134,10 @@ const Index = () => {
     },
   ];
 
+  const handlePlayerSearch = (query: string) => {
+    navigate(`/search?q=${encodeURIComponent(query)}`);
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header */}
@@ -105,13 +154,18 @@ const Index = () => {
             <p className="text-muted-foreground mb-8">
               Search from our database of thousands of professional football players.
             </p>
-            <SearchBar className="mx-auto" fullWidth />
+            <SearchBar className="mx-auto" fullWidth onSearch={handlePlayerSearch} />
           </div>
         </div>
       </section>
       
       {/* Featured Players Section */}
-      <section className={`py-16 transition-all duration-700 ${isScrolled ? 'opacity-100' : 'opacity-0 transform translate-y-10'}`}>
+      <section 
+        id="featured-section"
+        className={`py-16 transition-all duration-700 ${
+          isVisible.featured ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+        }`}
+      >
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-12">
             <div>
@@ -130,7 +184,10 @@ const Index = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {featuredPlayers.map((player, index) => (
               <div key={player.id} 
-                className={`transition-all duration-700 delay-${index * 100} ${isScrolled ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+                className={`transition-all duration-700 delay-${index * 100} ${
+                  isVisible.featured ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+                }`}
+              >
                 <PlayerCard 
                   {...player} 
                   onClick={() => navigate(`/player/${player.id}`)}
@@ -142,7 +199,12 @@ const Index = () => {
       </section>
       
       {/* Statistics Section */}
-      <section className={`py-16 bg-gradient-to-b from-white to-secondary/30 transition-all duration-700 ${isScrolled ? 'opacity-100' : 'opacity-0 transform translate-y-10'}`}>
+      <section 
+        id="stats-section"
+        className={`py-16 bg-gradient-to-b from-white to-secondary/30 transition-all duration-700 ${
+          isVisible.stats ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+        }`}
+      >
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center mb-12">
             <div className="inline-flex items-center px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
@@ -166,7 +228,12 @@ const Index = () => {
       </section>
       
       {/* How It Works Section */}
-      <section className={`py-16 transition-all duration-700 ${isScrolled ? 'opacity-100' : 'opacity-0 transform translate-y-10'}`}>
+      <section 
+        id="how-it-works-section"
+        className={`py-16 transition-all duration-700 ${
+          isVisible.howItWorks ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+        }`}
+      >
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center mb-12">
             <div className="inline-flex items-center px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
@@ -230,18 +297,18 @@ const Index = () => {
       {/* Simplified Footer */}
       <footer className="py-12 bg-secondary/50 border-t border-border">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="mb-8 md:mb-0">
+          <div className="flex justify-center">
+            <div className="text-center">
               <div className="font-bold text-2xl tracking-tight text-foreground mb-2">
                 <span className="text-primary">Value</span>Prophet
               </div>
-              <p className="text-muted-foreground text-sm">
+              <p className="text-muted-foreground text-sm mb-4">
                 AI-powered football player valuation
               </p>
             </div>
           </div>
           
-          <div className="border-t border-border mt-12 pt-8 flex justify-center">
+          <div className="border-t border-border mt-8 pt-8 flex justify-center">
             <div className="text-sm text-muted-foreground">
               © 2023 ValueProphet. All rights reserved.
             </div>

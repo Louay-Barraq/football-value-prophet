@@ -1,14 +1,17 @@
 
 import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Search, User, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/context/AuthContext";
 
 export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { isAuthenticated, login } = useAuth();
   
   // Track scroll position to change header appearance
   useEffect(() => {
@@ -24,6 +27,24 @@ export function Header() {
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [location.pathname]);
+
+  const handleSignIn = () => {
+    login();
+  };
+
+  const handleGetStarted = () => {
+    if (isAuthenticated) {
+      navigate("/dashboard");
+    } else {
+      navigate("/");
+      // Open auth modal
+      window.dispatchEvent(new CustomEvent("open-auth-modal"));
+    }
+  };
+
+  const handleSearchClick = () => {
+    navigate("/search");
+  };
 
   return (
     <header 
@@ -50,11 +71,11 @@ export function Header() {
         
         {/* Right Actions */}
         <div className="hidden md:flex items-center space-x-4">
-          <Button variant="ghost" size="icon" aria-label="Search">
+          <Button variant="ghost" size="icon" aria-label="Search" onClick={handleSearchClick}>
             <Search className="h-5 w-5" />
           </Button>
-          <Button variant="outline">Sign In</Button>
-          <Button>Get Started</Button>
+          <Button variant="outline" onClick={handleSignIn}>Sign In</Button>
+          <Button onClick={handleGetStarted}>Get Started</Button>
         </div>
         
         {/* Mobile Menu Button */}
@@ -80,11 +101,11 @@ export function Header() {
               <MobileNavLink to="/about" label="About" />
             </nav>
             <div className="flex flex-col space-y-4 pt-4 border-t border-border">
-              <Button variant="outline" className="w-full justify-start">
+              <Button variant="outline" className="w-full justify-start" onClick={handleSignIn}>
                 <User className="mr-2 h-4 w-4" />
                 Sign In
               </Button>
-              <Button className="w-full">Get Started</Button>
+              <Button className="w-full" onClick={handleGetStarted}>Get Started</Button>
             </div>
           </div>
         </div>
