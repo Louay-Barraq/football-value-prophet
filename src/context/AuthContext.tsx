@@ -16,7 +16,7 @@ type AuthContextType = {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string, rememberMe: boolean) => Promise<void>;
   signup: (name: string, email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
 };
@@ -86,13 +86,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string, rememberMe: boolean = false) => {
     setIsLoading(true);
     
     try {
       const { data, error } = await supabase.auth.signInWithPassword({ 
         email,
-        password 
+        password,
+        options: {
+          // Set session duration based on rememberMe flag
+          // 3600 = 1 hour (default), 86400 * 30 = 30 days
+          expiresIn: rememberMe ? 86400 * 30 : 3600
+        }
       });
       
       if (error) throw error;

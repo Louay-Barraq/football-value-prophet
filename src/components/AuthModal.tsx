@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -32,6 +33,7 @@ export function AuthModal({
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { login, signup } = useAuth();
   const { toast } = useToast();
@@ -41,7 +43,7 @@ export function AuthModal({
     setIsLoading(true);
     
     try {
-      await login(email, password);
+      await login(email, password, rememberMe);
       onClose();
     } catch (error) {
       // Error is handled in the login function
@@ -128,10 +130,10 @@ export function AuthModal({
               </div>
               <div className="flex justify-between items-center">
                 <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    id="remember"
-                    className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                  <Checkbox 
+                    id="remember" 
+                    checked={rememberMe} 
+                    onCheckedChange={(checked) => setRememberMe(checked === true)}
                   />
                   <Label
                     htmlFor="remember"
@@ -216,10 +218,8 @@ export function AuthModal({
                 </p>
               </div>
               <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
+                <Checkbox
                   id="terms"
-                  className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
                   required
                 />
                 <Label

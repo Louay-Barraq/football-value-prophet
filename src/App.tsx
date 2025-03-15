@@ -14,6 +14,7 @@ import Predictions from "./pages/Predictions";
 import PlayerProfile from "./pages/PlayerProfile";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
+import CsvImport from "./pages/CsvImport";
 
 // Create a Query Client
 const queryClient = new QueryClient();
@@ -34,6 +35,7 @@ const App = () => (
             <Route path="/predictions" element={<Predictions />} />
             <Route path="/player/:id" element={<PlayerProfile />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/import" element={<CsvImport />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

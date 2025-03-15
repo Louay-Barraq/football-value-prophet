@@ -17,10 +17,10 @@ export default function Search() {
   };
 
   return (
-    <div className="container max-w-6xl mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">Search Players</h1>
+    <div className="container max-w-6xl mx-auto px-4 py-16">
+      <h1 className="text-3xl font-bold mb-8 mt-4">Search Players</h1>
       
-      <div className="relative mb-6">
+      <div className="relative mb-8">
         <div className="flex">
           <div className="relative flex-grow">
             <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
