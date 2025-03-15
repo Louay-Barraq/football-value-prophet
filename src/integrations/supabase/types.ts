@@ -9,7 +9,172 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      player_statistics: {
+        Row: {
+          appearances: number | null
+          assists: number | null
+          created_at: string
+          goals: number | null
+          id: string
+          interceptions: number | null
+          minutes_played: number | null
+          pass_accuracy: number | null
+          player_id: string
+          season: string
+          tackles: number | null
+          updated_at: string
+        }
+        Insert: {
+          appearances?: number | null
+          assists?: number | null
+          created_at?: string
+          goals?: number | null
+          id?: string
+          interceptions?: number | null
+          minutes_played?: number | null
+          pass_accuracy?: number | null
+          player_id: string
+          season: string
+          tackles?: number | null
+          updated_at?: string
+        }
+        Update: {
+          appearances?: number | null
+          assists?: number | null
+          created_at?: string
+          goals?: number | null
+          id?: string
+          interceptions?: number | null
+          minutes_played?: number | null
+          pass_accuracy?: number | null
+          player_id?: string
+          season?: string
+          tackles?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_statistics_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      players: {
+        Row: {
+          age: number
+          club: string
+          club_logo: string | null
+          created_at: string
+          estimated_value: number | null
+          id: string
+          image_url: string | null
+          market_value: number
+          name: string
+          nationality: string
+          nationality_flag: string | null
+          position: string
+          updated_at: string
+        }
+        Insert: {
+          age: number
+          club: string
+          club_logo?: string | null
+          created_at?: string
+          estimated_value?: number | null
+          id?: string
+          image_url?: string | null
+          market_value: number
+          name: string
+          nationality: string
+          nationality_flag?: string | null
+          position: string
+          updated_at?: string
+        }
+        Update: {
+          age?: number
+          club?: string
+          club_logo?: string | null
+          created_at?: string
+          estimated_value?: number | null
+          id?: string
+          image_url?: string | null
+          market_value?: number
+          name?: string
+          nationality?: string
+          nationality_flag?: string | null
+          position?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      predictions: {
+        Row: {
+          confidence_score: number | null
+          created_at: string
+          id: string
+          notes: string | null
+          player_id: string
+          predicted_value: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          confidence_score?: number | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          player_id: string
+          predicted_value: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          confidence_score?: number | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          player_id?: string
+          predicted_value?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "predictions_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          full_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
