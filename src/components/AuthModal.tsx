@@ -13,6 +13,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/components/ui/use-toast";
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -31,29 +33,35 @@ export function AuthModal({
   const [name, setName] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const { login, signup } = useAuth();
+  const { toast } = useToast();
 
-  const handleSignIn = (e: React.FormEvent) => {
+  const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Simulate authentication delay
-    setTimeout(() => {
-      console.log("Sign in with:", { email, password });
-      setIsLoading(false);
+    try {
+      await login(email, password);
       onClose();
-    }, 1500);
+    } catch (error) {
+      // Error is handled in the login function
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleSignUp = (e: React.FormEvent) => {
+  const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Simulate registration delay
-    setTimeout(() => {
-      console.log("Sign up with:", { name, email, password });
-      setIsLoading(false);
+    try {
+      await signup(name, email, password);
       onClose();
-    }, 1500);
+    } catch (error) {
+      // Error is handled in the signup function
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

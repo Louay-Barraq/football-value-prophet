@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Search, User, Menu, X } from "lucide-react";
@@ -29,7 +28,7 @@ export function Header() {
   }, [location.pathname]);
 
   const handleSignIn = () => {
-    login();
+    window.dispatchEvent(new CustomEvent("open-auth-modal"));
   };
 
   const handleGetStarted = () => {
@@ -37,7 +36,6 @@ export function Header() {
       navigate("/dashboard");
     } else {
       navigate("/");
-      // Open auth modal
       window.dispatchEvent(new CustomEvent("open-auth-modal"));
     }
   };
