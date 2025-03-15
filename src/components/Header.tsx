@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Search, User, Menu, X, LogOut } from "lucide-react";
+import { Search, User, Menu, X, LogOut, LayoutDashboard, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
@@ -123,9 +123,11 @@ export function Header() {
                     Profile
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate("/dashboard")}>
+                    <LayoutDashboard className="mr-2 h-4 w-4" />
                     Dashboard
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate("/predictions")}>
+                    <TrendingUp className="mr-2 h-4 w-4" />
                     My Predictions
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
@@ -165,7 +167,10 @@ export function Header() {
                 <MobileNavLink to="/predictions" label="Predictions" />
                 <MobileNavLink to="/about" label="About" />
                 {isAuthenticated && (
-                  <MobileNavLink to="/profile" label="Profile" />
+                  <>
+                    <MobileNavLink to="/profile" label="Profile" />
+                    <MobileNavLink to="/dashboard" label="Dashboard" />
+                  </>
                 )}
               </nav>
               <div className="flex flex-col space-y-4 pt-4 border-t border-border">

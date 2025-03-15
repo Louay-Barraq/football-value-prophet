@@ -2,9 +2,13 @@
 import { ChevronRight, TrendingUp, Database, Award } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext";
 
 export function Hero() {
   const [isVisible, setIsVisible] = useState(false);
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
 
   // Animation on mount
   useEffect(() => {
@@ -13,6 +17,20 @@ export function Hero() {
     }, 100);
     return () => clearTimeout(timer);
   }, []);
+
+  // Handle button clicks
+  const handleTryPrediction = () => {
+    if (isAuthenticated) {
+      navigate('/predictions');
+    } else {
+      // Dispatch custom event to open auth modal
+      window.dispatchEvent(new Event('open-auth-modal'));
+    }
+  };
+
+  const handleExplorePlayers = () => {
+    navigate('/search');
+  };
 
   return (
     <section className="relative pt-20 overflow-hidden">
@@ -58,11 +76,11 @@ export function Hero() {
               isVisible ? "opacity-100" : "opacity-0 transform translate-y-4"
             }`}
           >
-            <Button size="lg" className="w-full sm:w-auto">
+            <Button size="lg" className="w-full sm:w-auto" onClick={handleTryPrediction}>
               Try Free Prediction
               <ChevronRight className="ml-1 h-4 w-4" />
             </Button>
-            <Button variant="outline" size="lg" className="w-full sm:w-auto">
+            <Button variant="outline" size="lg" className="w-full sm:w-auto" onClick={handleExplorePlayers}>
               Explore Players
             </Button>
           </div>

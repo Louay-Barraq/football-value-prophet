@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/context/AuthContext";
+import { Header } from "@/components/Header";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import About from "./pages/About";
@@ -14,6 +15,7 @@ import PlayerProfile from "./pages/PlayerProfile";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 
+// Create a Query Client
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -23,6 +25,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <Header />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/dashboard" element={<Dashboard />} />

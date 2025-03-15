@@ -5,7 +5,6 @@ import { useAuth } from "@/context/AuthContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Header } from "@/components/Header";
 import { PieChart, Pie, ResponsiveContainer, Cell, Tooltip as RechartsTooltip } from "recharts";
 import { BarChart3, ListFilter, Search, TrendingUp, UserRound } from "lucide-react";
 
@@ -34,14 +33,17 @@ const Dashboard = () => {
     { name: "Goalkeeper", value: 2, color: "#6366F1" },
   ];
 
+  // Handle navigation for buttons
+  const handleFindPlayers = () => navigate('/search');
+  const handleNewPrediction = () => navigate('/predictions');
+  const handleViewReports = () => navigate('/predictions');
+
   if (!isAuthenticated) {
     return null; // Will redirect in useEffect
   }
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Header />
-      
       <main className="flex-1 container mx-auto px-4 py-24">
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-8">
           <div>
@@ -159,15 +161,15 @@ const Dashboard = () => {
                 <CardTitle>Quick Actions</CardTitle>
               </CardHeader>
               <CardContent className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                <Button className="w-full justify-start">
+                <Button className="w-full justify-start" onClick={handleFindPlayers}>
                   <Search className="mr-2 h-4 w-4" />
                   Find Players
                 </Button>
-                <Button className="w-full justify-start">
+                <Button className="w-full justify-start" onClick={handleNewPrediction}>
                   <TrendingUp className="mr-2 h-4 w-4" />
                   New Prediction
                 </Button>
-                <Button variant="outline" className="w-full justify-start">
+                <Button variant="outline" className="w-full justify-start" onClick={handleViewReports}>
                   <ListFilter className="mr-2 h-4 w-4" />
                   View All Reports
                 </Button>
@@ -187,7 +189,7 @@ const Dashboard = () => {
                 <p className="text-muted-foreground">
                   You haven't made any predictions yet. Get started by searching for a player and creating your first valuation.
                 </p>
-                <Button className="mt-4">
+                <Button className="mt-4" onClick={handleNewPrediction}>
                   <TrendingUp className="mr-2 h-4 w-4" />
                   New Prediction
                 </Button>
@@ -207,7 +209,7 @@ const Dashboard = () => {
                 <p className="text-muted-foreground">
                   You haven't added any players to your favorites yet. Search for players and add them to your favorites for quick access.
                 </p>
-                <Button className="mt-4">
+                <Button className="mt-4" onClick={handleFindPlayers}>
                   <Search className="mr-2 h-4 w-4" />
                   Find Players
                 </Button>
