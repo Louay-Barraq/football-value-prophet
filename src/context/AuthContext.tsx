@@ -2,12 +2,14 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { getCurrentUserProfile } from "@/services/profileService";
 
 type User = {
   id: string;
   name: string;
   email: string;
   role: "user" | "admin";
+  avatarUrl?: string;
 };
 
 type AuthContextType = {
@@ -16,7 +18,7 @@ type AuthContextType = {
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   signup: (name: string, email: string, password: string) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -34,14 +36,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       if (data.session && !error) {
         const { user: authUser } = data.session;
-        
-        // Set user data
-        setUser({
-          id: authUser.id,
-          email: authUser.email || '',
-          name: authUser.user_metadata?.name || authUser.email?.split('@')[0] || '',
-          role: authUser.user_metadata?.role || 'user',
-        });
+        await updateUserState(authUser);
       }
       
       setIsLoading(false);
@@ -52,13 +47,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Subscribe to auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        if (session && event === 'SIGNED_IN') {
-          setUser({
-            id: session.user.id,
-            email: session.user.email || '',
-            name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || '',
-            role: session.user.user_metadata?.role || 'user',
-          });
+        if (session && (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED')) {
+          await updateUserState(session.user);
         } else if (event === 'SIGNED_OUT') {
           setUser(null);
         }
@@ -70,6 +60,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       subscription.unsubscribe();
     };
   }, []);
+
+  // Helper function to update user state with profile information
+  const updateUserState = async (authUser) => {
+    try {
+      // Get additional profile information
+      const profile = await getCurrentUserProfile();
+      
+      setUser({
+        id: authUser.id,
+        email: authUser.email || '',
+        name: profile?.full_name || authUser.user_metadata?.name || authUser.email?.split('@')[0] || '',
+        role: authUser.user_metadata?.role || 'user',
+        avatarUrl: profile?.avatar_url || '',
+      });
+    } catch (error) {
+      console.error("Error updating user state:", error);
+      // Fall back to basic user info if profile fetch fails
+      setUser({
+        id: authUser.id,
+        email: authUser.email || '',
+        name: authUser.user_metadata?.name || authUser.email?.split('@')[0] || '',
+        role: authUser.user_metadata?.role || 'user',
+      });
+    }
+  };
 
   const login = async (email: string, password: string) => {
     setIsLoading(true);
@@ -137,6 +152,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = async () => {
     try {
       await supabase.auth.signOut();
+      setUser(null);
       toast({
         title: "Logged out",
         description: "You have been logged out successfully.",

@@ -11,6 +11,7 @@ import About from "./pages/About";
 import Search from "./pages/Search";
 import Predictions from "./pages/Predictions";
 import PlayerProfile from "./pages/PlayerProfile";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -29,6 +30,7 @@ const App = () => (
             <Route path="/search" element={<Search />} />
             <Route path="/predictions" element={<Predictions />} />
             <Route path="/player/:id" element={<PlayerProfile />} />
+            <Route path="/profile" element={<Profile />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
