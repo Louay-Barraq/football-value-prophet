@@ -1,10 +1,9 @@
-
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ChevronLeft, CalendarIcon, TrendingUp, Pencil, Clock, Medal } from "lucide-react";
-import StatisticsChart from "@/components/StatisticsChart";
+import { ChevronLeft, CalendarIcon, TrendingUp, Pencil, Clock, Medal, Loader2 } from "lucide-react";
+import { StatisticsChart } from "@/components/StatisticsChart";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/context/AuthContext";
 import { usePlayer } from "@/hooks/usePlayer";
@@ -14,6 +13,14 @@ import { createPrediction } from "@/services/predictionsService";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { AuthModal } from "@/components/AuthModal";
+import { 
+  Table,
+  TableHeader,
+  TableBody,
+  TableHead,
+  TableRow,
+  TableCell
+} from "@/components/ui/table";
 
 export default function PlayerProfile() {
   const { id } = useParams<{ id: string }>();
@@ -27,7 +34,6 @@ export default function PlayerProfile() {
   const [notes, setNotes] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Fetch player data using our custom hook
   const { player, statistics, userPredictions, isLoading, error } = usePlayer(id || "");
 
   const handleBackClick = () => {
@@ -48,7 +54,6 @@ export default function PlayerProfile() {
     setIsSubmitting(true);
     
     try {
-      // Convert inputs to numbers
       const valueNumber = parseInt(predictedValue.replace(/[^0-9]/g, ""), 10);
       const confidenceNumber = confidenceScore ? parseFloat(confidenceScore) : undefined;
       
@@ -123,7 +128,6 @@ export default function PlayerProfile() {
       </Button>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        {/* Player Info Card */}
         <Card className="col-span-1">
           <CardHeader className="pb-2">
             <CardTitle className="text-xl flex justify-between items-center">
@@ -201,7 +205,6 @@ export default function PlayerProfile() {
               )}
             </div>
             
-            {/* Prediction Button */}
             {isPredicting ? (
               <div className="mt-6 space-y-4">
                 <h3 className="font-medium">Make Your Prediction</h3>
@@ -272,7 +275,6 @@ export default function PlayerProfile() {
           </CardContent>
         </Card>
         
-        {/* Statistics Card */}
         <Card className="col-span-2">
           <CardHeader>
             <CardTitle className="text-xl">Performance Statistics</CardTitle>
@@ -393,7 +395,6 @@ export default function PlayerProfile() {
         </Card>
       </div>
       
-      {/* User predictions card (only show if authenticated and has predictions) */}
       {isAuthenticated && userPredictions.length > 0 && (
         <Card className="mb-8">
           <CardHeader>

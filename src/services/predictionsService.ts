@@ -22,10 +22,18 @@ export async function createPrediction(
   confidenceScore?: number, 
   notes?: string
 ): Promise<Prediction> {
+  // Get the current authenticated user
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  if (!user) {
+    throw new Error("User must be authenticated to create a prediction");
+  }
+  
   const { data, error } = await supabase
     .from('predictions')
     .insert({
       player_id: playerId,
+      user_id: user.id,
       predicted_value: predictedValue,
       confidence_score: confidenceScore,
       notes: notes
@@ -80,10 +88,17 @@ export async function deletePrediction(predictionId: string): Promise<void> {
 }
 
 export async function getPlayerPredictionsByUser(playerId: string): Promise<Prediction[]> {
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  if (!user) {
+    return [];
+  }
+  
   const { data, error } = await supabase
     .from('predictions')
     .select('*')
-    .eq('player_id', playerId);
+    .eq('player_id', playerId)
+    .eq('user_id', user.id);
   
   if (error) {
     console.error(`Error fetching predictions for player ${playerId}:`, error);

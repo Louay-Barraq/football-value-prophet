@@ -6,12 +6,16 @@ import { cn } from "@/lib/utils";
 
 interface StatisticsChartProps {
   data: Array<{
-    name: string;
-    value: number;
+    season?: string;
+    name?: string;
+    value?: number;
+    goals?: number;
+    assists?: number;
+    appearances?: number;
     maxValue?: number;
     color?: string;
   }>;
-  title: string;
+  title?: string;
   description?: string;
   className?: string;
 }
@@ -29,12 +33,28 @@ export function StatisticsChart({
     setIsClient(true);
   }, []);
   
-  // Set default colors if not provided
-  const chartData = data.map(item => ({
-    ...item,
-    color: item.color || "#3B82F6",
-    maxValue: item.maxValue || 100
-  }));
+  // Process the data for the chart
+  const processedData = data.map(item => {
+    // If the data is already in the name/value format
+    if (item.name && item.value !== undefined) {
+      return {
+        ...item,
+        color: item.color || "#3B82F6",
+        maxValue: item.maxValue || 100
+      };
+    }
+    
+    // If the data is in the season/goals/assists format (from player statistics)
+    return {
+      name: item.season || "",
+      value: item.goals || 0,
+      color: "#3B82F6",
+      maxValue: 30, // Default max value for goals chart
+      goals: item.goals || 0,
+      assists: item.assists || 0,
+      appearances: item.appearances || 0
+    };
+  });
   
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
@@ -42,10 +62,10 @@ export function StatisticsChart({
       return (
         <div className="bg-white p-2 rounded-md shadow-md border border-gray-100 text-sm">
           <p className="font-medium">{data.name}</p>
-          <p className="text-gray-700">{`Value: ${data.value}`}</p>
-          {data.maxValue && (
-            <p className="text-gray-500 text-xs">{`Max: ${data.maxValue}`}</p>
-          )}
+          {data.goals !== undefined && <p className="text-gray-700">{`Goals: ${data.goals}`}</p>}
+          {data.assists !== undefined && <p className="text-gray-700">{`Assists: ${data.assists}`}</p>}
+          {data.appearances !== undefined && <p className="text-gray-700">{`Appearances: ${data.appearances}`}</p>}
+          {data.value !== undefined && data.goals === undefined && <p className="text-gray-700">{`Value: ${data.value}`}</p>}
         </div>
       );
     }
@@ -55,7 +75,7 @@ export function StatisticsChart({
   return (
     <Card className={cn("overflow-hidden", className)}>
       <CardHeader>
-        <CardTitle>{title}</CardTitle>
+        <CardTitle>{title || "Statistics"}</CardTitle>
         {description && <CardDescription>{description}</CardDescription>}
       </CardHeader>
       <CardContent className="p-0">
@@ -63,7 +83,7 @@ export function StatisticsChart({
           {isClient && (
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
-                data={chartData}
+                data={processedData}
                 margin={{ top: 20, right: 30, left: 0, bottom: 60 }}
               >
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
@@ -87,7 +107,7 @@ export function StatisticsChart({
                   dataKey="value" 
                   radius={[4, 4, 0, 0]}
                 >
-                  {chartData.map((entry, index) => (
+                  {processedData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Bar>
